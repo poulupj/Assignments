@@ -8,21 +8,18 @@
 #include "producer.hpp"
 #include "consumer.hpp"
 
-// Function to execute the producer as a thread
 void producerHandler(int n, std::shared_ptr<CircularBuffer> circularBuffer)
 {
     Producer producer(n, circularBuffer);
     producer.produce();
 }
 
-// Function to execute consumer as a thread
 void consumerHandler(int id, std::shared_ptr<CircularBuffer> circularBuffer)
 {
     Consumer consumer(id, circularBuffer);
     consumer.consume();
 }
 
-// Verify the output *.txt files.
 bool checkOutputFiles(int n, int c)
 {
     std::vector<bool> present(n + 1, false);
@@ -99,7 +96,7 @@ TEST(OutputFile, CorrectNumbersPresent)
         consumers[i] = std::thread(consumerHandler, i + 1, circularBuffer);
     }
 
-    producer.join();
+        producer.join();
 
     for(int i = 0; i < c; i++)
     {
@@ -107,4 +104,5 @@ TEST(OutputFile, CorrectNumbersPresent)
     }
 
     ASSERT_TRUE(checkOutputFiles(n, c));
+
 }
