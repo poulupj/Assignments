@@ -17,7 +17,7 @@ void Consumer::consume()
         while (!circularBuffer->read(data))
         {
             // If buffer is empty and producer has stopped, stop consuming.
-            if (circularBuffer->readProducerFinished() == true)
+            if (circularBuffer->IsReaderDone() == true)
             {
                 file.close();
                 return;

@@ -28,15 +28,15 @@ public:
     /**
      * @brief A helper function to to let buffer know production is complete
      */
-    virtual void writeProducerFinished() = 0;
+    virtual void IsWriterDone() = 0;
 
     /**
      * @brief A helper function to check if production is complete
      */
-    virtual bool readProducerFinished() = 0;
+    virtual bool IsReaderDone() = 0;
 
     /* @brief destructor */
-    virtual ~ICircularBuffer() {}
+    virtual ~ICircularBuffer() = default;
 };
 
 #endif
