@@ -20,27 +20,27 @@ public:
 
     bool read(int& read) override;
 
-    void writeProducerFinished() override;
+    void IsWriterDone() override;
 
-    bool readProducerFinished() override;
+    bool IsReaderDone() override;
 
-    ~CircularBuffer() {}
+    ~CircularBuffer() = default;
 
 private:
     // Buffer
-    std::vector<int> buffer;
+    std::vector<int> m_buffer;
 
     // Front and Back pointers
-    int front, back;
+    int m_front = -1, m_back = -1;
 
     // Size of buffer
-    int size;
+    int m_size;
 
     // Mutex to lock access to buffer
-    std::mutex bufferLock;
+    std::mutex m_bufferLock;
 
     // Status of production
-    std::atomic<bool> producerFinished;
+    std::atomic<bool> m_producerFinished = ATOMIC_VAR_INIT(false);
 };
 
 #endif

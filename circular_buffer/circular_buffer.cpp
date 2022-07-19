@@ -2,24 +2,21 @@
 #include "circular_buffer_interface.hpp"
 
 CircularBuffer::CircularBuffer(int n) : 
-    buffer(std::vector<int>(n / sizeof(int))), front(-1), back(-1), size(n / sizeof(int))
-{
-    producerFinished.store(false);
-}
+    m_buffer(std::vector<int>(n / sizeof(int))), m_size(n / sizeof(int)) {}
 
 bool CircularBuffer::isEmpty() const
 {
-    return (front == -1);
+    return (m_front == -1);
 }
 
 bool CircularBuffer::isFull() const
 {
-    return ((back + 1) % size == front);
+    return ((m_back + 1) % m_size == m_front);
 }
 
 bool CircularBuffer::write(int data)
 {
-    std::lock_guard<std::mutex> lock(bufferLock);
+    std::lock_guard<std::mutex> lock(m_bufferLock);
 
     if (isFull())
     {
@@ -28,47 +25,47 @@ bool CircularBuffer::write(int data)
 
     if (isEmpty())
     {
-        front = back = 0;
+        m_front = m_back = 0;
     }
     else
     {
-        back = (back + 1) % size;
+        m_back = (m_back + 1) % m_size;
     }
 
-    buffer[back] = data;
+    m_buffer[m_back] = data;
 
     return true;
 }
 
 bool CircularBuffer::read(int &data)
 {
-    std::lock_guard<std::mutex> lock(bufferLock);
+    std::lock_guard<std::mutex> lock(m_bufferLock);
 
     if (isEmpty())
     {
         return false;
     }
 
-    data = buffer[front];
+    data = m_buffer[m_front];
 
-    if (front == back)
+    if (m_front == m_back)
     {
-        front = back = -1;
+        m_front = m_back = -1;
     }
     else
     {
-        front = (front + 1) % size;
+        m_front = (m_front + 1) % m_size;
     }
 
     return true;
 }
 
-void CircularBuffer::writeProducerFinished()
+void CircularBuffer::IsWriterDone()
 {
-    producerFinished.store(true);
+    m_producerFinished.store(true);
 }
 
-bool CircularBuffer::readProducerFinished()
+bool CircularBuffer::IsReaderDone()
 {
-    return producerFinished.load();
+    return m_producerFinished.load();
 }

@@ -17,5 +17,5 @@ void Producer::produce()
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    circularBuffer->writeProducerFinished();
+    circularBuffer->IsWriterDone();
 }
