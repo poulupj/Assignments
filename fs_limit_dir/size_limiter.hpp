@@ -2,13 +2,22 @@
 #define _SIZE_LIMITER_HPP_
 
 #include <filesystem>
+#include <vector>
 
-class SizeLimiter 
+class SizeLimiter
 {
 public:
     SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize);
 
-    bool checkSizeExceeded() const;
+    void constructDirEntries();
+
+    void sortDirEntries();
+
+    std::uintmax_t currentDirectorySize() const;
+
+    void removeEmptyFolders() const;
+
+    void limitSize();
 
     ~SizeLimiter() = default;
 
@@ -18,6 +27,9 @@ private:
 
     // Max size
     std::uintmax_t m_maxSize;
+
+    // Stores directory entries
+    std::vector<std::filesystem::directory_entry> m_dirEntries;
 };
 
 #endif
