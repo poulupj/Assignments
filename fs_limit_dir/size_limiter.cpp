@@ -2,7 +2,8 @@
 #include <iostream>
 #include <algorithm>
 
-SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : m_workingPath(std::filesystem::current_path() / workingPath), m_maxSize(maxSize)
+SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : 
+    m_workingPath(std::filesystem::current_path() / workingPath), m_maxSize(maxSize)
 {
     constructDirEntries();
 }
