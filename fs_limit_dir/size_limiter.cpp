@@ -1,19 +1,17 @@
 #include "size_limiter.hpp"
 #include <iostream>
-#include <cstdlib>
 #include <algorithm>
 
-SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : m_workingPath(workingPath), m_maxSize(maxSize)
+SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : m_workingPath(std::filesystem::current_path() / workingPath), m_maxSize(maxSize)
 {
     constructDirEntries();
 }
 
 void SizeLimiter::constructDirEntries()
 {
-    std::string const home = std::getenv("HOME") ? std::getenv("HOME") : ".";
-
-    for (auto const &dirEntry : std::filesystem::recursive_directory_iterator(home + m_workingPath.string()))
+    for (auto const &dirEntry : std::filesystem::recursive_directory_iterator(m_workingPath))
     {
+        // Add the directory_entry to the list if it is a file
         std::filesystem::file_status currentFileStatus = std::filesystem::status(dirEntry);
 
         if (currentFileStatus.type() == std::filesystem::file_type::regular)
@@ -38,12 +36,8 @@ std::uintmax_t SizeLimiter::currentDirectorySize() const
 
     for (auto const &dirEntry : m_dirEntries)
     {
-        std::filesystem::file_status currentFileStatus = std::filesystem::status(dirEntry);
-
-        if (currentFileStatus.type() == std::filesystem::file_type::regular)
-        {
-            size += std::filesystem::file_size(dirEntry);
-        }
+        // Add the size of each file
+        size += std::filesystem::file_size(dirEntry);
     }
 
     return size;
@@ -51,10 +45,9 @@ std::uintmax_t SizeLimiter::currentDirectorySize() const
 
 void SizeLimiter::removeEmptyFolders() const
 {
-    std::string const home = std::getenv("HOME") ? std::getenv("HOME") : ".";
     std::vector<std::filesystem::directory_entry> dirEntriesToDelete;
 
-    for (auto const &dirEntry : std::filesystem::recursive_directory_iterator(home + m_workingPath.string()))
+    for (auto const &dirEntry : std::filesystem::recursive_directory_iterator(m_workingPath))
     {
         std::filesystem::file_status currentFileStatus = std::filesystem::status(dirEntry);
 
@@ -62,6 +55,7 @@ void SizeLimiter::removeEmptyFolders() const
         {
             if (std::filesystem::is_empty(dirEntry))
             {
+                // If an empty directory is found, add it to delete list
                 dirEntriesToDelete.push_back(dirEntry);
             }
         }
@@ -89,6 +83,7 @@ void SizeLimiter::limitSize()
             currentSize -= std::filesystem::file_size(dirEntry);
             std::filesystem::remove(dirEntry);
 
+            // Remove files until size is below the limit
             if (currentSize < maxSizeBytes)
             {
                 break;
@@ -97,11 +92,4 @@ void SizeLimiter::limitSize()
     }
 
     removeEmptyFolders();
-}
-
-int main()
-{
-    SizeLimiter s("/Desktop/temp2", 2);
-    s.limitSize();
-    return 0;
 }

@@ -1,0 +1,10 @@
+Limit Directory:
+1. size_limiter.cpp and size_limiter.hpp 
+     - SizeLimiter class implementation. 
+     - It checks if the directory exceeds the size limit and deletes files
+
+2. test.cpp
+     - test for SizeLimiter class implementation
+
+3. Makefile
+     - Makefile for creating the executable.
