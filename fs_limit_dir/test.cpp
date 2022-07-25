@@ -86,11 +86,11 @@ TEST(NoDeletionTest, SizeUnderLimit)
 
     std::vector<std::filesystem::directory_entry> expectedDirectoryEntries;
 
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/f1.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir1/f2.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir1/f3.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f4.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f5.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/f1.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir1/f2.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir1/f3.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f4.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f5.txt"));
 
     std::vector<std::filesystem::directory_entry> actualDirectoryEntries = getSortedDirectoryEntries(p);
 
@@ -117,9 +117,9 @@ TEST(DeletionTest, SizeOverLimit)
 
     std::vector<std::filesystem::directory_entry> expectedDirectoryEntries;
 
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir1/f3.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f4.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f5.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir1/f3.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f4.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f5.txt"));
 
     std::vector<std::filesystem::directory_entry> actualDirectoryEntries = getSortedDirectoryEntries(p);
 
@@ -146,14 +146,14 @@ TEST(DeletionTest, FolderRemoved)
 
     std::vector<std::filesystem::directory_entry> expectedDirectoryEntries;
 
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f4.txt"));
-    expectedDirectoryEntries.push_back(std::filesystem::directory_entry("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir2/f5.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f4.txt"));
+    expectedDirectoryEntries.push_back(std::filesystem::directory_entry(std::filesystem::current_path().string() + "/sample_dir/dir2/f5.txt"));
 
     std::vector<std::filesystem::directory_entry> actualDirectoryEntries = getSortedDirectoryEntries(p);
 
     ASSERT_EQ(expectedDirectoryEntries.size(), actualDirectoryEntries.size());
 
-    ASSERT_FALSE(std::filesystem::exists("/home/poulu/Desktop/Github/Assignments/fs_limit_dir/sample_dir/dir1/"));
+    ASSERT_FALSE(std::filesystem::exists(std::filesystem::current_path().string() + "/sample_dir/dir1/"));
 
     for (auto i = 0; i < expectedDirectoryEntries.size(); i++)
     {
