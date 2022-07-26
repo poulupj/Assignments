@@ -28,21 +28,16 @@ void Server::error(const char *message) const
     exit(EXIT_FAILURE);
 }
 
-void Server::setUp() const
+void Server::setUp()
 {
-    // Sockets for establishing connection and transmission
-    int connectionFD, transmissionFD;
+    // Address of server
+    struct sockaddr_in serverAddress = {};
 
-    socklen_t clientLength;
+    int option = 1;
+    m_connectionFD = socket(AF_INET, SOCK_STREAM, 0);
+    setsockopt(m_connectionFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
-    char buffer[256];
-
-    // Address of server and client
-    struct sockaddr_in serverAddress = {}, clientAddress = {};
-
-    connectionFD = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (connectionFD < 0)
+    if (m_connectionFD < 0)
     {
         error("Error in opening socket\n");
     }
@@ -52,69 +47,75 @@ void Server::setUp() const
     serverAddress.sin_addr.s_addr = inet_addr(m_ipAddress.c_str());
     serverAddress.sin_port = htons(m_portNumber);
 
-    if ((bind(connectionFD, (struct sockaddr *)&serverAddress,
+    if ((bind(m_connectionFD, (struct sockaddr *)&serverAddress,
               sizeof(serverAddress))) < 0)
     {
         error("Error in binding socket\n");
     }
+}
 
+void Server::openConnection()
+{
+    socklen_t clientLength;
     // Start listening
-    while (true)
+
+    listen(m_connectionFD, 0);
+
+    clientLength = sizeof(m_clientAddress);
+
+    // Accept a connection
+    m_transmissionFD = accept(m_connectionFD,
+                              (struct sockaddr *)&m_clientAddress, &clientLength);
+
+    if (m_transmissionFD < 0)
     {
-        listen(connectionFD, 0);
+        error("Error in accepting connection\n");
+    }
+}
 
-        clientLength = sizeof(clientAddress);
+void Server::closeConnection()
+{
+    // Close transmission socket once the client disconnects
+    close(m_transmissionFD);
+}
 
-        // Accept a connection
-        transmissionFD = accept(connectionFD,
-                                (struct sockaddr *)&clientAddress, &clientLength);
+void Server::receiveCommand()
+{
 
-        if (transmissionFD < 0)
-        {
-            error("Error in accepting connection\n");
-        }
+    char buffer[256];
+    clearBuffer(buffer, 256);
 
-        while (true)
-        {
-            clearBuffer(buffer, 256);
+    int status = read(m_transmissionFD, buffer, 255);
 
-            int status = read(transmissionFD, buffer, 255);
-
-            if (status < 0)
-            {
-                error("Error in reading from the socket\n");
-            }
-
-            buffer[strlen(buffer) - 1] = '\0';
-
-            printf("Received command: %s\n", buffer);
-
-            // If exit is passed, terminate the connection
-            if (strcmp(buffer, "exit") == 0)
-            {
-                break;
-            }
-
-            std::string output = execute(buffer);
-
-            if(output.size() == 0)
-            {
-                output = "Success\n";
-            }
-        
-            status = write(transmissionFD, output.c_str(), output.size());
-
-            if (status < 0)
-            {
-                error("Error in writing to socket\n");
-            }
-        }
-
-        // Close transmission socket once the client disconnects
-        close(transmissionFD);
+    if (status < 0)
+    {
+        error("Error in reading from the socket\n");
     }
 
-    close(connectionFD);
+    // buffer[strlen(buffer) - 1] = '\0';
+
+    // printf("Received command: %s\n", buffer);
+
+    // If exit is passed, terminate the connection
+    if (strcmp(buffer, "exit") == 0)
+    {
+        closeConnection();
+        return;
+    }
+
+    std::string output = execute(buffer);
+
+    if (output.size() == 0)
+    {
+        output = "Success\n";
+    }
+
+    status = write(m_transmissionFD, output.c_str(), output.size());
+
+    if (status < 0)
+    {
+        error("Error in writing to socket\n");
+    }
 }
 
 std::vector<std::string> Server::splitCommand(std::string command) const
@@ -229,9 +230,8 @@ std::string Server::execute(char *command) const
     return receivedOutput;
 }
 
-int main()
+Server::~Server()
 {
-    Server s;
-
-    return 0;
+    closeConnection();
+    close(m_connectionFD);
 }

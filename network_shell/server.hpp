@@ -1,10 +1,13 @@
 #ifndef _SERVER_HPP_
 #define _SERVER_HPP_
 
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <string>
 #include <vector>
 
-class Server{
+class Server
+{
 public:
     Server();
 
@@ -21,10 +24,16 @@ public:
     /**
      * @brief To set up a connection and start listening
      */
-    void setUp() const;
+    void setUp();
+
+    void openConnection();
+
+    void closeConnection();
+
+    void receiveCommand();
 
     /**
-     * @brief A helper function to split a command string 
+     * @brief A helper function to split a command string
      */
     std::vector<std::string> splitCommand(std::string command) const;
 
@@ -34,12 +43,19 @@ public:
 
     std::string execute(char *command) const;
 
+    ~Server();
+
 private:
     // Port number
     int m_portNumber = 9000;
 
     // IP address
     std::string m_ipAddress = "127.0.0.1";
+
+    // Sockets for establishing connection and transmission
+    int m_connectionFD = -1, m_transmissionFD = -1;
+
+    struct sockaddr_in m_clientAddress = {};
 };
 
 #endif

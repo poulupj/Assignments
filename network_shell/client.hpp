@@ -21,7 +21,16 @@ public:
     /**
      * @brief To connect to a server
      */
-    void connectToServer() const;
+    void connectToServer();
+
+    void disconnectFromServer();
+
+    /**
+     * @brief To send a command to the server
+     */
+    std::string executeCommand(const char buffer[256]);
+
+    ~Client();
 
 private:
     // Port number
@@ -29,6 +38,9 @@ private:
 
     // IP address
     std::string m_ipAddress = "127.0.0.1";
+
+    // Socket to transmit data
+    int m_transmissionFD = -1;
 };
 
 #endif

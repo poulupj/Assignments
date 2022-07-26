@@ -26,19 +26,16 @@ void Client::error(const char *message) const
     exit(0);
 }
 
-void Client::connectToServer() const
+void Client::connectToServer()
 {
-    // Socket for transmitting
-    int transmissionFD;
-
     // Address of server
     struct sockaddr_in serverAddress = {};
 
     char buffer[256];
 
-    transmissionFD = socket(AF_INET, SOCK_STREAM, 0);
+    m_transmissionFD = socket(AF_INET, SOCK_STREAM, 0);
 
-    if (transmissionFD < 0)
+    if (m_transmissionFD < 0)
     {
         error("Error in opening socket\n");
     }
@@ -49,51 +46,50 @@ void Client::connectToServer() const
     serverAddress.sin_port = htons(m_portNumber);
 
     // Connect to the server
-    if (connect(transmissionFD, (struct sockaddr *)&serverAddress,
+    if (connect(m_transmissionFD, (struct sockaddr *)&serverAddress,
                 sizeof(serverAddress)) < 0)
     {
         error("Error in connecting\n");
     }
+}
 
-    // Start sending to server
-    while (true)
+void Client::disconnectFromServer()
+{
+    close(m_transmissionFD);
+}
+
+std::string Client::executeCommand(const char buffer[256])
+{
+    int status = write(m_transmissionFD, buffer, strlen(buffer));
+
+    if (status < 0)
     {
-        clearBuffer(buffer, 256);
-        printf("cli > ");
-
-        fgets(buffer, 255, stdin);
-
-        int status = write(transmissionFD, buffer, strlen(buffer));
-
-        if (status < 0)
-        {
-            error("Error in writing to socket\n");
-        }
-
-        if (strcmp(buffer, "exit\n") == 0)
-        {
-            break;
-        }
-
-        char output[1000];
-        clearBuffer(output, 1000);
-
-        status = read(transmissionFD, output, 1000);
-
-        if (status < 0)
-        {
-            error("Error in reading from the socket\n");
-        }
-
-        std::cout<<output;
+        error("Error in writing to socket\n");
     }
 
-    close(transmissionFD);
+    //clearBuffer(buffer, 256);
+
+    if (strcmp(buffer, "exit\n") == 0)
+    {
+        return "";
+    }
+
+    char output[1000];
+    clearBuffer(output, 1000);
+
+    status = read(m_transmissionFD, output, 1000);
+
+    if (status < 0)
+    {
+        error("Error in reading from the socket\n");
+    }
+
+    std::string s = output;
+    return s;
 }
 
-int main()
+Client::~Client()
 {
-    Client c;
-
-    return 0;
+    close(m_transmissionFD);
 }
+
