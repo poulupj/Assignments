@@ -2,6 +2,7 @@
 #define _SERVER_HPP_
 
 #include <string>
+#include <vector>
 
 class Server{
 public:
@@ -21,6 +22,17 @@ public:
      * @brief To set up a connection and start listening
      */
     void setUp() const;
+
+    /**
+     * @brief A helper function to split a command string 
+     */
+    std::vector<std::string> splitCommand(std::string command) const;
+
+    /**
+     * @brief A function to execute the command and return the result
+     */
+
+    std::string execute(char *command) const;
 
 private:
     // Port number
