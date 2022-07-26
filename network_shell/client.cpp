@@ -6,6 +6,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 #include "client.hpp"
 
@@ -55,25 +56,36 @@ void Client::connectToServer() const
     }
 
     // Start sending to server
-    while(true)
+    while (true)
     {
         clearBuffer(buffer, 256);
-        printf("Please enter message: ");
+        printf("cli > ");
 
         fgets(buffer, 255, stdin);
 
         int status = write(transmissionFD, buffer, strlen(buffer));
 
-        if(status < 0)
+        if (status < 0)
         {
             error("Error in writing to socket\n");
         }
 
-        if(strcmp(buffer, "exit\n") == 0)
+        if (strcmp(buffer, "exit\n") == 0)
         {
             break;
         }
-        
+
+        char output[1000];
+        clearBuffer(output, 1000);
+
+        status = read(transmissionFD, output, 1000);
+
+        if (status < 0)
+        {
+            error("Error in reading from the socket\n");
+        }
+
+        std::cout<<output;
     }
 
     close(transmissionFD);

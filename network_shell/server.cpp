@@ -87,7 +87,7 @@ void Server::setUp() const
 
             buffer[strlen(buffer) - 1] = '\0';
 
-            printf("MESSAGE: %s\n", buffer);
+            printf("Received command: %s\n", buffer);
 
             // If exit is passed, terminate the connection
             if (strcmp(buffer, "exit") == 0)
@@ -95,7 +95,19 @@ void Server::setUp() const
                 break;
             }
 
-            std::cout<<execute(buffer);
+            std::string output = execute(buffer);
+
+            if(output.size() == 0)
+            {
+                output = "Success\n";
+            }
+        
+            status = write(transmissionFD, output.c_str(), output.size());
+
+            if (status < 0)
+            {
+                error("Error in writing to socket\n");
+            }
         }
 
         // Close transmission socket once the client disconnects
