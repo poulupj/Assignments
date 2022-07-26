@@ -15,3 +15,11 @@ $ cd fs_limit_dir
 $ make  
 $ ./test  
 ```
+
+## 3. Linux-shell over a network 
+Client-Server communication. To run,
+```
+$ cd network_shell
+$ make  
+$ ./test  
+```

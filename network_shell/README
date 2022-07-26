@@ -1,0 +1,14 @@
+Networking:
+1. server.cpp and server.hpp 
+     - Server class implementation. 
+     - It receives commands from the client and execute it
+
+2. client.cpp and client.hpp
+     - Client class implementation.
+     - It sends commands to the server
+
+2. test.cpp
+     - test for Server and Client class implementation
+
+3. Makefile
+     - Makefile for creating the executable.
