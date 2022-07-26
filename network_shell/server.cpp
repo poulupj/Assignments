@@ -33,6 +33,7 @@ void Server::setUp()
     // Address of server
     struct sockaddr_in serverAddress = {};
 
+    // Create the socket, resuse if already used.
     int option = 1;
     m_connectionFD = socket(AF_INET, SOCK_STREAM, 0);
     setsockopt(m_connectionFD, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
@@ -181,6 +182,7 @@ std::string Server::execute(char *command) const
 
         close(pipePToC[0]);
 
+        // split the commands to make it of the form char *const argv[] to pass to execv
         std::vector<std::string> commandSplit = splitCommand(recievedCommand);
 
         char **args = (char **)malloc((commandSplit.size() + 1) * sizeof(char *));
@@ -192,14 +194,17 @@ std::string Server::execute(char *command) const
         }
         args[index] = NULL;
 
+        // path to the command to be executed
         char path[50] = "/bin/";
         strcat(path, args[0]);
 
+        // Redirect the output to pipe to parent
         dup2(pipeCToP[1], 1);
         dup2(pipeCToP[1], 2);
 
         close(pipeCToP[1]);
 
+        // Execute the command
         execv(path, args);
 
         free(args);
@@ -208,6 +213,9 @@ std::string Server::execute(char *command) const
     }
     else
     {
+        // If parent,
+
+        // Close the pipes not required
         close(pipePToC[0]);
         close(pipeCToP[1]);
 
@@ -215,6 +223,7 @@ std::string Server::execute(char *command) const
 
         close(pipePToC[1]);
 
+        // Wait for child to finish
         int status;
         waitpid(processID, &status, 0);
 

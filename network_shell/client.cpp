@@ -60,6 +60,7 @@ void Client::disconnectFromServer()
 
 std::string Client::executeCommand(const char buffer[256])
 {
+    // Send the command
     int status = write(m_transmissionFD, buffer, strlen(buffer));
 
     if (status < 0)

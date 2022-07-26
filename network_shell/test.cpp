@@ -46,6 +46,7 @@ bool checkOutput(std::string actualOutput)
         return false;
 }
 
+// A handler to run the server
 void runServer()
 {
     auto server = std::make_unique<Server>();
@@ -55,6 +56,7 @@ void runServer()
     server->receiveCommand();
 }
 
+// A handler to run the client
 void runClient(const char *command, std::promise<std::string> &&output)
 {
     auto client = std::make_unique<Client>();

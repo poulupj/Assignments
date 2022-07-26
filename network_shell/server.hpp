@@ -26,10 +26,19 @@ public:
      */
     void setUp();
 
+    /**
+     * @brief To open a connection to a client
+     */
     void openConnection();
 
+    /**
+     * @brief To close a connection to a client
+     */
     void closeConnection();
 
+    /**
+     * @brief Receive a command from the client
+     */
     void receiveCommand();
 
     /**
@@ -55,6 +64,7 @@ private:
     // Sockets for establishing connection and transmission
     int m_connectionFD = -1, m_transmissionFD = -1;
 
+    // To hold client address data
     struct sockaddr_in m_clientAddress = {};
 };
 

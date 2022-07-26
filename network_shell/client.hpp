@@ -23,6 +23,9 @@ public:
      */
     void connectToServer();
 
+    /**
+     * @brief To disconnect from the server
+     */
     void disconnectFromServer();
 
     /**
