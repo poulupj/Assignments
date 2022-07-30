@@ -41,17 +41,6 @@ public:
      */
     void receiveCommand();
 
-    /**
-     * @brief A helper function to split a command string
-     */
-    std::vector<std::string> splitCommand(std::string command) const;
-
-    /**
-     * @brief A function to execute the command and return the result
-     */
-
-    std::string execute(char *command) const;
-
     ~Server();
 
 private:
@@ -66,6 +55,16 @@ private:
 
     // To hold client address data
     struct sockaddr_in m_clientAddress = {};
+
+    /**
+     * @brief A helper function to split a command string
+     */
+    std::vector<std::string> splitCommand(const std::string &command) const;
+
+    /**
+     * @brief A function to execute the command and return the result
+     */
+    std::string execute(char *command) const;
 };
 
 #endif

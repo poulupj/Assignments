@@ -33,6 +33,10 @@ void Server::setUp()
     // Address of server
     struct sockaddr_in serverAddress = {};
 
+    // COMMENT: Any specific reason to reuse the address?
+    // After the server socket is closed, the system is not freeing it immediately.
+    // While testing, only the first test case can successfully bind. It takes a
+    // few minutes for the socket to become reusable automatically. 
     // Create the socket, resuse if already used.
     int option = 1;
     m_connectionFD = socket(AF_INET, SOCK_STREAM, 0);
@@ -119,18 +123,19 @@ void Server::receiveCommand()
     }
 }
 
-std::vector<std::string> Server::splitCommand(std::string command) const
+std::vector<std::string> Server::splitCommand(const std::string& command) const
 {
+    std::string commandCopy = command;
     std::string space_delimiter = " ";
     std::vector<std::string> words;
 
     size_t pos = 0;
-    while ((pos = command.find(space_delimiter)) != std::string::npos)
+    while ((pos = commandCopy.find(space_delimiter)) != std::string::npos)
     {
-        words.push_back(command.substr(0, pos));
-        command.erase(0, pos + space_delimiter.length());
+        words.push_back(commandCopy.substr(0, pos));
+        commandCopy.erase(0, pos + space_delimiter.length());
     }
-    words.push_back(command);
+    words.push_back(commandCopy);
 
     return words;
 }
@@ -194,10 +199,6 @@ std::string Server::execute(char *command) const
         }
         args[index] = NULL;
 
-        // path to the command to be executed
-        char path[50] = "/bin/";
-        strcat(path, args[0]);
-
         // Redirect the output to pipe to parent
         dup2(pipeCToP[1], 1);
         dup2(pipeCToP[1], 2);
@@ -205,7 +206,7 @@ std::string Server::execute(char *command) const
         close(pipeCToP[1]);
 
         // Execute the command
-        execv(path, args);
+        execvp(args[0], args);
 
         free(args);
 
