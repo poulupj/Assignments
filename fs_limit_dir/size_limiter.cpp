@@ -2,11 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
-SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : 
-    m_workingPath(std::filesystem::current_path() / workingPath), m_maxSize(maxSize)
-{
-    constructDirEntries();
-}
+SizeLimiter::SizeLimiter(const std::filesystem::path workingPath, const std::uintmax_t maxSize) : m_workingPath(std::filesystem::current_path() / workingPath), m_maxSize(maxSize) {}
 
 void SizeLimiter::constructDirEntries()
 {
@@ -70,6 +66,8 @@ void SizeLimiter::removeEmptyFolders() const
 
 void SizeLimiter::limitSize()
 {
+    constructDirEntries();
+
     std::uintmax_t currentSize = currentDirectorySize();
 
     // Convert m_maxSize to bytes
