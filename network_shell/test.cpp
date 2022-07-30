@@ -107,7 +107,7 @@ TEST(CommandTest, mkdir)
 
     serverThread.join();
 
-    ASSERT_TRUE(std::filesystem::exists(std::filesystem::current_path().string() + "/sample_dir/"));
+    ASSERT_TRUE(std::filesystem::exists(std::filesystem::current_path() / std::string("sample_dir/")));
 
-    std::filesystem::remove_all(std::filesystem::current_path().string() + "/sample_dir");
+    std::filesystem::remove_all(std::filesystem::current_path() / std::string("sample_dir"));
 }
